@@ -19,7 +19,6 @@ int main(int argc, char **argv) {
         store(parse_command_line(argc, argv, desc), vm);
         notify(vm);
         if (vm.count("log-level")) {
-
             loglevel = vm["log-level"].as<std::string>();
             std::cout << "log-level:" << loglevel << std::endl;
         } else {
@@ -91,3 +90,4 @@ int main(int argc, char **argv) {
     BOOST_LOG_TRIVIAL(info) << "done";
     return 0;
 }
+
