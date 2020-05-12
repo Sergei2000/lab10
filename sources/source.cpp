@@ -74,8 +74,6 @@ int main(int argc, char **argv) {
             boost::log::keywords::format =
                     "[%ThreadID%][%TimeStamp%][%Severity%]: %Message%");
     boost::log::add_common_attributes();
-
-
     db bd1;
     bd1.parse(pathin);
     bd1.open_db();
