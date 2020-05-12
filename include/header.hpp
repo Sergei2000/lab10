@@ -36,7 +36,6 @@
 
 static std::queue <element> elements;
 static std::mutex m1, m2;
-std::string loglevel,pathin,pathout;
 int threadcount;
 
 struct database {
@@ -57,7 +56,8 @@ struct database {
     }
 
     void open_db() {
-        rocksdb::DB::Open(rocksdb::DBOptions(), _way, _column_families, &_handles, &_db);
+        rocksdb::DB::Open(rocksdb::DBOptions(),
+                _way, _column_families, &_handles, &_db);
     }
 
     void my() {
@@ -65,10 +65,9 @@ struct database {
         for (int i = 0; i < threadcount; ++i) {
             threads.emplace_back(&database::fill_bd, this);
         }
-        for (auto &it:threads) {
+        for (auto &it : threads) {
             it.join();
         }
-
     }
 
     element read_value(std::string key, std::string column_family_name) {
@@ -92,11 +91,15 @@ struct database {
     void write_value(element el) {
         m2.lock();
         std::vector<std::string>::iterator it =
-                std::find(_column_families_names.begin(), _column_families_names.end(),
-                                                          el._family_name);
+                std::find(_column_families_names.begin(),
+                        _column_families_names.end(),
+                        el._family_name);
         if (it != _column_families_names.end()) {
             //found
-            _db->Put(rocksdb::WriteOptions(), _handles[std::distance(_column_families_names.begin(), it)], el._key,
+            _db->Put(rocksdb::WriteOptions(),
+                    _handles[std::distance
+                    (_column_families_names.begin(), it)],
+                    el._key,
                      picosha2::hash256_hex_string(el._key + el._value));
             BOOST_LOG_TRIVIAL(info) << el._key + ":" + el._value;
             m2.unlock();
@@ -104,14 +107,17 @@ struct database {
             //not found
             m2.unlock();
         }
-
     }
 
     void read_all() {
-        for (const auto iter:_handles) {
-            rocksdb::Iterator *it = _db->NewIterator(rocksdb::ReadOptions(), iter);
+        for (const auto iter : _handles) {
+            rocksdb::Iterator *it =
+                    _db->NewIterator(rocksdb::ReadOptions(),
+                            iter);
             for (it->SeekToFirst(); it->Valid(); it->Next()) {
-                element tmp(iter->GetName(), it->key().ToString(), it->value().ToString());
+                element tmp(iter->GetName(),
+                        it->key().ToString(),
+                        it->value().ToString());
                 elements.push(tmp);
             }
             assert(it->status().ok());
@@ -143,7 +149,8 @@ struct database {
         assert(s.ok());
         rocksdb::ColumnFamilyHandle *h1;
         for (int i = 0; i < family_names.size(); ++i) {
-            s = db->CreateColumnFamily(rocksdb::ColumnFamilyOptions(), family_names[i], &h1);
+            s = db->CreateColumnFamily(rocksdb::ColumnFamilyOptions(),
+                    family_names[i], &h1);
             delete h1;
         }
         delete db;
@@ -157,7 +164,8 @@ struct database {
                                                 &_column_families_names);
         assert(status.ok());
         for (auto a:_column_families_names) {
-            _column_families.emplace_back(a, rocksdb::ColumnFamilyOptions());
+            _column_families.emplace_back(a,
+                    rocksdb::ColumnFamilyOptions());
         }
     }
 
