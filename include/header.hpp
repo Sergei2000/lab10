@@ -148,7 +148,7 @@ struct database {
         rocksdb::Status s = rocksdb::DB::Open(options, way, &db);
         assert(s.ok());
         rocksdb::ColumnFamilyHandle *h1;
-        for (std::vector::size_type i = 0; i < family_names.size(); ++i) {
+        for (unsigned long i = 0; i < family_names.size(); ++i) {
             s = db->CreateColumnFamily(rocksdb::ColumnFamilyOptions(),
                     family_names[i], &h1);
             delete h1;
