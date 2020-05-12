@@ -12,7 +12,7 @@
 #include <rocksdb/slice.h>
 #include <rocksdb/options.h>
 #include <rocksdb/table.h>
-#include <rocksdb/delete_scheduler.h>
+//#include <rocksdb/delete_scheduler.h>
 #include <queue>
 #include <mutex>
 #include <boost/thread/thread.hpp>
