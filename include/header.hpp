@@ -6,7 +6,7 @@
 #include <iostream>
 #include <thread>
 #include <string>
-#include <string>
+#include <vector>
 #include <algorithm>
 #include <rocksdb/db.h>
 #include <rocksdb/slice.h>
@@ -31,21 +31,25 @@
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/parsers.hpp>
 #include <boost/program_options/variables_map.hpp>
-#include "picosha2.h"
-#include "key_val.h"
+#include <picosha2.h>
+#include <key_val.h>
 
-static std::queue<element> elements;
+static std::queue <element> elements;
 static std::mutex m1, m2;
+std::string loglevel,pathin,pathout;
+int threadcount;
 
 struct database {
     database() {}
 
     void print() {
-        for (const auto iter:_handles) {
+        for (const auto iter : _handles) {
             std::cout << "family " + iter->GetName() << std::endl;
-            rocksdb::Iterator *it = _db->NewIterator(rocksdb::ReadOptions(), iter);
+            rocksdb::Iterator *it = _db->NewIterator
+                    (rocksdb::ReadOptions(), iter);
             for (it->SeekToFirst(); it->Valid(); it->Next()) {
-                std::cout << it->key().ToString() << ": " << it->value().ToString() << std::endl;
+                std::cout << it->key().ToString() << ": "
+                << it->value().ToString() << std::endl;
             }
             assert(it->status().ok());
             delete it;
@@ -57,8 +61,8 @@ struct database {
     }
 
     void my() {
-        std::vector<std::thread> threads;
-        for (int i = 0; i < 6; ++i) {
+        std::vector <std::thread> threads;
+        for (int i = 0; i < threadcount; ++i) {
             threads.emplace_back(&database::fill_bd, this);
         }
         for (auto &it:threads) {
@@ -68,12 +72,16 @@ struct database {
     }
 
     element read_value(std::string key, std::string column_family_name) {
-        std::vector<std::string>::iterator it = std::find(_column_families_names.begin(), _column_families_names.end(),
-                                                          column_family_name);
+        std::vector<std::string>::iterator it =
+                std::find(_column_families_names.begin(),
+                        _column_families_names.end(),
+                        column_family_name);
         if (it != _column_families_names.end()) {
             //found
             std::string value;
-            _db->Get(rocksdb::ReadOptions(), _handles[std::distance(_column_families_names.begin(), it)], key, &value);
+            _db->Get(rocksdb::ReadOptions(),
+                    _handles[std::distance
+                    (_column_families_names.begin(), it)], key, &value);
             element tmp(column_family_name, key, value);
             return tmp;
         } else {
@@ -83,7 +91,8 @@ struct database {
 
     void write_value(element el) {
         m2.lock();
-        std::vector<std::string>::iterator it = std::find(_column_families_names.begin(), _column_families_names.end(),
+        std::vector<std::string>::iterator it =
+                std::find(_column_families_names.begin(), _column_families_names.end(),
                                                           el._family_name);
         if (it != _column_families_names.end()) {
             //found
@@ -116,7 +125,6 @@ struct database {
             m1.lock();
             if (!elements.empty()) {
                 element tmp = elements.front();
-
                 write_value(tmp);
                 elements.pop();
                 m1.unlock();
@@ -124,11 +132,10 @@ struct database {
                 status = true;
                 m1.unlock();
             }
-
         }
     }
 
-    void create_db(std::string way, std::vector<std::string> family_names) {
+    void create_db(std::string way, std::vector <std::string> family_names) {
         rocksdb::Options options;
         options.create_if_missing = true;
         rocksdb::DB *db;
@@ -159,8 +166,8 @@ struct database {
     }
 
     std::string _way;
-    std::vector<std::string> _column_families_names;
-    std::vector<rocksdb::ColumnFamilyDescriptor> _column_families;
+    std::vector <std::string> _column_families_names;
+    std::vector <rocksdb::ColumnFamilyDescriptor> _column_families;
     std::vector<rocksdb::ColumnFamilyHandle *> _handles;
     rocksdb::DB *_db;
 };
