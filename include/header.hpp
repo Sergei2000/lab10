@@ -163,7 +163,7 @@ struct database {
                                                 way_to_db,
                                                 &_column_families_names);
         assert(status.ok());
-        for (auto a:_column_families_names) {
+        for (auto a : _column_families_names) {
             _column_families.emplace_back(a,
                     rocksdb::ColumnFamilyOptions());
         }
