@@ -149,7 +149,8 @@ struct database {
         assert(s.ok());
         rocksdb::ColumnFamilyHandle *h1;
         for (auto &iter : family_names) {
-            s = db->CreateColumnFamily(rocksdb::ColumnFamilyOptions(), iter, &h1);
+            s = db->CreateColumnFamily
+            (rocksdb::ColumnFamilyOptions(), iter, &h1);
             delete h1;
         }
         delete db;
