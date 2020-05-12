@@ -1,7 +1,7 @@
 // Copyright 2018 Your Name <your_email>
 
 #include <header.hpp>
-
+#include <constants.h>
 int main(int argc, char **argv) {
     std::string loglevel, pathin, pathout;
     try {
